@@ -6,7 +6,7 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/12 18:01:57 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/12 18:09:33 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/11/12 18:15:28 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,21 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	joined[i] = '\0';
 	return (joined);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	while (*s)
+	{
+		if (*s == (char)c)
+		{
+			return ((char *)s);
+		}
+		s++;
+	}
+	if ((char)c == '\0')
+	{
+		return ((char *)s);
+	}
+	return ((void *)0);
 }
