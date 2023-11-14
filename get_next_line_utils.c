@@ -6,14 +6,14 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/12 18:01:57 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/12 18:15:28 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/11/14 22:24:49 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stddef.h>
-#include "libft.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "get_next_line.h"
 
 void	*ft_calloc(size_t count, size_t size)
 {
@@ -30,7 +30,36 @@ void	*ft_calloc(size_t count, size_t size)
 	return (ptr);
 }
 
-char	*ft_strdup(const char *s1)
+void	*ft_memset(void *b, int c, size_t len)
+
+{
+	unsigned char	*ptr;
+
+	ptr = (unsigned char *)b;
+	while (len--)
+		*ptr++ = c;
+	return (b);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	ft_memset(s, '\0', n);
+}
+/*
+int	ft_strlen(char *str)
+{
+	int	len;
+
+	len = 0;
+	while (*str)
+	{
+		len++;
+		str++;
+	}
+	return (len);
+}
+
+char	*ft_strdup(char *s1)
 {
 	size_t			size;
 	unsigned int	i;
@@ -49,6 +78,9 @@ char	*ft_strdup(const char *s1)
 	copy[i] = '\0';
 	return (copy);
 }
+
+
+
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
@@ -92,4 +124,4 @@ char	*ft_strchr(const char *s, int c)
 		return ((char *)s);
 	}
 	return ((void *)0);
-}
+}*/
