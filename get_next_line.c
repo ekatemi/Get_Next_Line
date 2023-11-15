@@ -12,14 +12,14 @@
 
 #include "get_next_line.h"
 
-#define BUF_SIZE 6
+#define BUF_SIZE 7
 
-char *get_next_line(int fd)
+char *read_line(int fd)
 {
     int bytes_read;
     char *buffer;
-    static int count = 1;
-    printf("malloc#[%d]---", count++);
+    //static int count = 1;
+    //printf("malloc#[%d]---", count++);
     buffer = malloc(BUF_SIZE * sizeof(char) + 1);
     if (!buffer)
         return NULL;
@@ -29,7 +29,7 @@ char *get_next_line(int fd)
 		free(buffer);
         return NULL;
 	}
-	buffer[BUF_SIZE] = '\0';
+	buffer[bytes_read] = '\0';
     return buffer;
 }
 
@@ -45,7 +45,7 @@ int main (void)
 		return(1);
 	while(42)
 	{
-	next_line = get_next_line(fd);
+	next_line = read_line(fd);
 	if (next_line == NULL)
 		break;
 	count++;
