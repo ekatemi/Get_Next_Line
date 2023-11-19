@@ -18,7 +18,7 @@
 
 #include "get_next_line.h"
 
-#define BUFFER_SIZE 2
+#define BUFFER_SIZE 10
 
 int ft_strlen(char *str)
 {
@@ -85,31 +85,29 @@ char *append_buffer(char *basin_buffer, char *read_buffer)
 }
 
 
-char	*extract_line(char *storage)
-{
-	int		size_line;
-	char	*line_return;
-	int		i;
-
-	i = 0;
-	size_line = 0;
-	if (storage[0] == '\0')
-		return (NULL);
-	while (storage[size_line] && storage[size_line] != '\n')
-		size_line++;
-	if (storage[size_line] == '\n')
-		size_line++;
-	line_return = malloc((size_line + 1) * sizeof(char));
-	if (!line_return)
-		return (NULL);
-	i = 0;
-	while (i < size_line)
-	{
-		line_return[i] = storage[i];
-		i++;
-	}
-	line_return[i] = '\0';
-	return (line_return);
+char *extract_line(char *storage) {
+    int i;
+	int size_line;
+	
+	if (storage[0] == '\0') {
+        return NULL;  // Empty string, no line to extract
+    }
+    size_line = 0;
+    while (storage[size_line] != 0 && storage[size_line] != '\n') {
+        size_line++;
+    }
+    if (storage[size_line] == '\n') 
+        size_line++;  // Include the newline character in the extracted line
+    char *line = malloc((size_line + 1) * sizeof(char));
+    if (!line) 
+        return NULL;  // Memory allocation failed
+    i = 0;
+    while (i < size_line) {
+        line[i] = storage[i];
+        i++;
+    }
+    line[i] = '\0';  // Null-terminate the string
+    return (line);
 }
 
 char	*update_storage(char *storage)
@@ -126,7 +124,7 @@ char	*update_storage(char *storage)
 		return (NULL);
 	}
 	size_rest_of_line = ft_strlen(ptr_newline + 1);
-	rest_of_line = (char *) malloc(size_rest_of_line * sizeof(char) + 1);
+	rest_of_line = malloc(size_rest_of_line * sizeof(char) + 1);
 	if (!rest_of_line)
 	{
 		free(storage);
