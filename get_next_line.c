@@ -14,6 +14,33 @@
 
 #define BUF_SIZE 7
 
+char *ft_strjoin(char *s1, char *s2)
+{
+    size_t len1;
+    size_t len2;
+    size_t i;
+    size_t j;
+    
+    len1 = 0;
+    len2 = 0;
+    i = 0;
+    j = 0;
+    if (s1 != NULL)
+        len1 = strlen(s1);
+    if (s2 != NULL)
+        len2 = strlen(s2);
+    char *joined = malloc(len1 + len2 + 1);
+    if (!joined)
+        return NULL; // Allocation failed
+    while (s1 != NULL && s1[i])
+        joined[j++] = s1[i++];
+    i = 0;
+    while (s2 != NULL && s2[i])
+        joined[j++] = s2[i++];
+    joined[j] = '\0';
+    return joined;
+}
+
 char *read_line(int fd)
 {
     int bytes_read;

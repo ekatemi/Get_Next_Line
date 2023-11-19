@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/06 21:29:13 by emikhayl          #+#    #+#             */
+/*   Updated: 2023/11/14 22:39:12 by emikhayl         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -6,7 +18,7 @@
 
 #include "get_next_line.h"
 
-#define BUF_SIZE 4
+#define BUFFER_SIZE 2
 
 int ft_strlen(char *str)
 {
@@ -21,24 +33,29 @@ int ft_strlen(char *str)
     return (len);
 }
 
-char	*ft_strdup(char *s1)
+char    *ft_strjoin(char *s1, char *s2)
 {
-	size_t			size;
-	unsigned int	i;
-	char			*copy;
 
-	i = 0;
-	size = ft_strlen(s1);
-	copy = (char *)malloc(sizeof(char) * (size + 1));
-	if (copy == NULL)
-		return (NULL);
-	while (s1[i] != '\0')
-	{
-		copy[i] = s1[i];
-		i++;
-	}
-	copy[i] = '\0';
-	return (copy);
+    char    *joined;
+    size_t  i;
+    size_t  j;
+
+    joined = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+    i = 0;
+    j = 0;
+    if (joined == NULL)
+        return (NULL);
+    while (s1[i])
+    {
+        joined[j++] = s1[i++];
+    }
+    i = 0;
+    while (s2[i])
+    {
+        joined[j++] = s2[i++];
+    }
+    joined[j] = '\0';
+    return (joined);
 }
 
 char	*ft_strchr(char *s, int c)
@@ -58,167 +75,127 @@ char	*ft_strchr(char *s, int c)
 	return (NULL);
 }
 
-char *ft_strjoin(char *s1, char *s2)
+char *append_buffer(char *basin_buffer, char *read_buffer)
 {
-    size_t len1;
-    size_t len2;
-    size_t i;
-    size_t j;
-    
-    len1 = 0;
-    len2 = 0;
-    i = 0;
-    j = 0;
-    if (s1 != NULL)
-        len1 = strlen(s1);
-    if (s2 != NULL)
-        len2 = strlen(s2);
-    char *joined = malloc(len1 + len2 + 1);
-    if (!joined)
-        return NULL; // Allocation failed
-    while (s1 != NULL && s1[i])
-        joined[j++] = s1[i++];
-    i = 0;
-    while (s2 != NULL && s2[i])
-        joined[j++] = s2[i++];
-    joined[j] = '\0';
-    return joined;
+ char *temp;
+
+ temp = ft_strjoin(basin_buffer, read_buffer);
+ free(basin_buffer);
+ return (temp);
 }
 
-char *append_buffer(char *buffer, char *readtime_buffer)
+
+char	*extract_line(char *storage)
 {
-    char *temp;
-    
-    temp = ft_strjoin(buffer, readtime_buffer);
-    free(buffer);
-    buffer = NULL;
-    return (temp);
+	int		size_line;
+	char	*line_return;
+	int		i;
+
+	i = 0;
+	size_line = 0;
+	if (storage[0] == '\0')
+		return (NULL);
+	while (storage[size_line] && storage[size_line] != '\n')
+		size_line++;
+	if (storage[size_line] == '\n')
+		size_line++;
+	line_return = malloc((size_line + 1) * sizeof(char));
+	if (!line_return)
+		return (NULL);
+	i = 0;
+	while (i < size_line)
+	{
+		line_return[i] = storage[i];
+		i++;
+	}
+	line_return[i] = '\0';
+	return (line_return);
 }
 
-char *read_from_file(char *bucket_buffer, int fd)
+char	*update_storage(char *storage)
 {
-    char *spoon_buffer;
-    int bytes_read;
+	char	*ptr_newline;
+	char	*rest_of_line;
+	int		size_rest_of_line;
+	int		i;
 
-    spoon_buffer = malloc(BUF_SIZE * sizeof(char) + 1);
-    if (!spoon_buffer)
-        return NULL;
-
-    // Read data into the spoon_buffer
-    bytes_read = read(fd, spoon_buffer, BUF_SIZE);
-    if (bytes_read == -1)
-        return free(spoon_buffer), NULL;
-
-    if (bytes_read == 0)
-    {
-        // End of file reached, free spoon_buffer and return NULL
-        free(spoon_buffer);
-        return NULL;
-    }
-
-    spoon_buffer[bytes_read] = '\0';
-
-    // Append spoon_buffer to bucket_buffer
-    bucket_buffer = append_buffer(bucket_buffer, spoon_buffer);
-
-    // Free spoon_buffer
-    free(spoon_buffer);
-
-    return bucket_buffer;
+	ptr_newline = ft_strchr(storage, '\n');
+	if (!ptr_newline)
+	{
+		free(storage);
+		return (NULL);
+	}
+	size_rest_of_line = ft_strlen(ptr_newline + 1);
+	rest_of_line = (char *) malloc(size_rest_of_line * sizeof(char) + 1);
+	if (!rest_of_line)
+	{
+		free(storage);
+		return (NULL);
+	}
+	i = -1;
+	while (++i < size_rest_of_line)
+		rest_of_line[i] = ptr_newline[i + 1];
+	rest_of_line[i] = '\0';
+	free (storage);
+	storage = rest_of_line;
+	return (storage);
 }
 
-char *extract_line (char *buffer)
+char *read_from_file(char *basin_buffer, int fd)
 {
-    char *line;
-    char *newline_pos = ft_strchr(buffer, '\n');
-    if (newline_pos == NULL)
-        return NULL;
-    size_t length_line = newline_pos - buffer;
-    line = malloc(length_line * sizeof(char) + 1);
-    if (!line)
-        return NULL;
-    strncpy(line, buffer, length_line);
-    line[length_line] = '\0';
-    return line;
-}
+ char *cup_buffer;
+ int  bytes_read;
 
-char *extract_remaining(char *buffer)
-{
-    char *line;
-    char *newline_pos = ft_strchr(buffer, '\n');
-    if (newline_pos == NULL)
-        return NULL;
-    int length_line = ft_strlen(newline_pos) + 1;
-    line = malloc(length_line * sizeof(char));
-    if (!line)
-        return NULL;
-    
-    line = strdup(newline_pos);
-    free(newline_pos);
-    return line;
+ cup_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
+ if (!cup_buffer)
+  return (NULL);
+ bytes_read = 1;
+ while (bytes_read > 0)
+ {
+  bytes_read = read(fd, cup_buffer, BUFFER_SIZE);
+  if (bytes_read == -1)
+   return (free(cup_buffer), NULL);
+  cup_buffer[bytes_read] = '\0';
+  basin_buffer = append_buffer(basin_buffer, cup_buffer);
+  if (ft_strchr(basin_buffer, '\n'))
+   break ;
+ }
+ free (cup_buffer);
+ return (basin_buffer);
 }
 
 char *get_next_line(int fd)
 {
-    static char *bucket_buffer;
-    char *line;
+ static char *basin_buffer;
+ char  *line;
 
-    if (fd < 0 || BUF_SIZE <= 0) 
-        return NULL;
-
-    if (!bucket_buffer)
-    {
-        // Allocate memory for the initial buffer
-        bucket_buffer = malloc(BUF_SIZE + 1);
-        if (!bucket_buffer)
-            return NULL;
-    }
-
-    if (!ft_strchr(bucket_buffer, '\n'))
-    {
-        // Read more data into the buffer if needed
-        bucket_buffer = read_from_file(bucket_buffer, fd);
-        if (!bucket_buffer)
-            return NULL;
-    }
-
-    line = extract_line(bucket_buffer);
-    if (line == NULL)
-    {
-        // No more lines, free the buffer and return NULL
-        free(bucket_buffer);
-        bucket_buffer = NULL;
-    }
-    else
-    {
-        // Update bucket_buffer to point to the remaining characters
-        bucket_buffer = extract_remaining(bucket_buffer);
-    }
-    if(!line)
-        return NULL;
-    return line;
+ if (fd < 0 || read(fd, NULL, 0) < 0 || BUFFER_SIZE <= 0) 
+  return (NULL);
+ if (!basin_buffer)
+  basin_buffer = malloc(sizeof (char) * 1); 
+ if (!ft_strchr(basin_buffer, '\n'))
+  basin_buffer = read_from_file(basin_buffer, fd);
+ if (!basin_buffer)
+  return (free(basin_buffer), NULL);
+ line = extract_line(basin_buffer);
+ basin_buffer = update_storage(basin_buffer);
+ return (line);
 }
 
-int main (void)
+int main(void)
 {
-    int fd;
-    char *next_line;
-    int count;
-
-    count = 0;
-    fd = open("archivo.txt", O_RDONLY);
-    if (fd == -1)
-        return(1);
-    while(42)
+    int     file_descriptor;
+    char    *result;
+    file_descriptor = open("archivo.txt", O_RDONLY);
+    result = get_next_line(file_descriptor);
+	
+    while (result)
     {
-    next_line = get_next_line(fd);
-    if (next_line == NULL)
-        break;
-    count++;
-    printf("[%d] :%s\n", count, next_line);
-    free(next_line);
-    next_line = NULL;
+        printf("%s", result);
+        free(result);
+        result = get_next_line(file_descriptor);
     }
-    close(fd);
+	
+    free(result);
     return (0);
 }

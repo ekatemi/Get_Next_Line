@@ -202,12 +202,10 @@ char *get_next_line(int fd)
         // Read more data into the buffer if needed
         bucket_buffer = read_from_file(bucket_buffer, fd);
         printf("What returns read_from_file ----->%s\n", bucket_buffer);
-        if (!bucket_buffer)
-            return NULL;
     }
 
     line = extract_line(bucket_buffer);
-    printf("What returns extract_line ----->%s\n", bucket_buffer);
+    //printf("What returns extract_line ----->%s\n", bucket_buffer);
     if (line == NULL)
     {
         // No more lines, free the buffer and return NULL
@@ -225,26 +223,20 @@ char *get_next_line(int fd)
 }
 
 
-int main (void)
+int main(void)
 {
-    int fd;
-    char *next_line;
-    int count;
-
-    count = 0;
-    fd = open("archivo.txt", O_RDONLY);
-    if (fd == -1)
-        return(1);
-    while(42)
+    int     file_descriptor;
+    char    *result;
+    file_descriptor = open("archivo.txt", O_RDONLY);
+	result = get_next_line(file_descriptor);
+    //result = get_next_line(file_descriptor);
+	printf("%s", result);
+    while (result)
     {
-    next_line = get_next_line(fd);
-    if (next_line == NULL)
-        break;
-    count++;
-    printf("[%d] :%s\n", count, next_line);
-    free(next_line);
-    next_line = NULL;
+        printf("%s", result);
+        free(result);
+        result = get_next_line(file_descriptor);
     }
-    close(fd);
+    free(result);
     return (0);
 }
