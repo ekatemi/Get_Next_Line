@@ -20,9 +20,9 @@
 #include <fcntl.h>
 
 void	*ft_calloc(size_t count, size_t size);
-char	*ft_strdup(const char *s1);
+char	*ft_strdup(char *s1);
 char	*ft_strjoin(char *s1, char *s2);
-char	*ft_strchr(const char *s, int c);
+char	*ft_strchr(char *s, int c);
 char *get_next_line(int fd);
 void    ft_bzero(void *s, size_t n);
 void    *ft_memset(void *b, int c, size_t len);

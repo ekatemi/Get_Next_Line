@@ -15,37 +15,6 @@
 #include <stdio.h>
 #include "get_next_line.h"
 
-void	*ft_calloc(size_t count, size_t size)
-{
-	char	*ptr;
-
-	ptr = (char *)malloc(count * size);
-	if (count == 0 || size == 0)
-	{
-		count = 1;
-		size = 1;
-	}
-	if (ptr)
-		ft_bzero (ptr, count * size);
-	return (ptr);
-}
-
-void	*ft_memset(void *b, int c, size_t len)
-
-{
-	unsigned char	*ptr;
-
-	ptr = (unsigned char *)b;
-	while (len--)
-		*ptr++ = c;
-	return (b);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	ft_memset(s, '\0', n);
-}
-/*
 int	ft_strlen(char *str)
 {
 	int	len;

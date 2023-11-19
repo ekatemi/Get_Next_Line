@@ -6,7 +6,7 @@
 
 #include "get_next_line.h"
 
-#define BUF_SIZE 10
+#define BUF_SIZE 4
 
 int ft_strlen(char *str)
 {
@@ -58,8 +58,6 @@ char	*ft_strchr(char *s, int c)
 	return (NULL);
 }
 
-
-
 char *ft_strjoin(char *s1, char *s2)
 {
     size_t len1;
@@ -87,15 +85,15 @@ char *ft_strjoin(char *s1, char *s2)
     return joined;
 }
 
-char *append_buffer(char *buffer, char *spoon_buffer)
+char *append_buffer(char *buffer, char *readtime_buffer)
 {
     char *temp;
     
-    temp = ft_strjoin(buffer, spoon_buffer);
+    temp = ft_strjoin(buffer, readtime_buffer);
     free(buffer);
+    buffer = NULL;
     return (temp);
 }
-
 
 char *read_from_file(char *bucket_buffer, int fd)
 {
@@ -129,55 +127,34 @@ char *read_from_file(char *bucket_buffer, int fd)
     return bucket_buffer;
 }
 
-char *extract_line(char *bucket_buffer)
+char *extract_line (char *buffer)
 {
     char *line;
-    char *newline_pos = ft_strchr(bucket_buffer, '\n');
-
+    char *newline_pos = ft_strchr(buffer, '\n');
     if (newline_pos == NULL)
-    {
-        // No newline found, return the entire content
-        line = ft_strdup(bucket_buffer);
-        bucket_buffer = NULL; // No remaining characters in the buffer
-    }
-    else
-    {
-        // Newline found, extract characters up to newline
-        size_t line_length = newline_pos - bucket_buffer;
-        line = malloc(line_length + 1); // +1 for null-termination
-        if (!line)
-            return NULL;
-        strncpy(line, bucket_buffer, line_length);
-        line[line_length] = '\0';
-        
-        // Update bucket_buffer to point to the remaining characters
-        bucket_buffer = ft_strdup(newline_pos + 1); // +1 to skip the newline
-    }
-
+        return NULL;
+    size_t length_line = newline_pos - buffer;
+    line = malloc(length_line * sizeof(char) + 1);
+    if (!line)
+        return NULL;
+    strncpy(line, buffer, length_line);
+    line[length_line] = '\0';
     return line;
 }
 
-
-char *obtain_remaining(char *str)
+char *extract_remaining(char *buffer)
 {
-    char *line = NULL;
-    char *n = ft_strchr(str, '\n');
-
-    if (n != NULL)
-    {
-        // Calculate the length of the remaining characters
-        size_t remaining_length = strlen(n + 1);
-
-        // Allocate memory for the remaining characters
-        line = malloc(remaining_length + 1);  // +1 for null-termination
-        if (!line)
-            return NULL;
-
-        // Copy the remaining characters using strncpy
-        strncpy(line, n + 1, remaining_length);
-        line[remaining_length] = '\0';  // Null-terminate the string
-    }
-
+    char *line;
+    char *newline_pos = ft_strchr(buffer, '\n');
+    if (newline_pos == NULL)
+        return NULL;
+    int length_line = ft_strlen(newline_pos) + 1;
+    line = malloc(length_line * sizeof(char));
+    if (!line)
+        return NULL;
+    
+    line = strdup(newline_pos);
+    free(newline_pos);
     return line;
 }
 
@@ -201,13 +178,11 @@ char *get_next_line(int fd)
     {
         // Read more data into the buffer if needed
         bucket_buffer = read_from_file(bucket_buffer, fd);
-        printf("What returns read_from_file ----->%s\n", bucket_buffer);
         if (!bucket_buffer)
             return NULL;
     }
 
     line = extract_line(bucket_buffer);
-    printf("What returns extract_line ----->%s\n", bucket_buffer);
     if (line == NULL)
     {
         // No more lines, free the buffer and return NULL
@@ -217,13 +192,12 @@ char *get_next_line(int fd)
     else
     {
         // Update bucket_buffer to point to the remaining characters
-        bucket_buffer = obtain_remaining(bucket_buffer);
+        bucket_buffer = extract_remaining(bucket_buffer);
     }
     if(!line)
         return NULL;
     return line;
 }
-
 
 int main (void)
 {
