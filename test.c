@@ -93,16 +93,16 @@ char *extract_line(char *storage) {
         return NULL;  // Empty string, no line to extract
     }
     size_line = 0;
-    while (storage[size_line] != 0 && storage[size_line] != '\n') {
+    while (storage[size_line] != 0 && storage[size_line] != '\n')
         size_line++;
-    }
     if (storage[size_line] == '\n') 
         size_line++;  // Include the newline character in the extracted line
     char *line = malloc((size_line + 1) * sizeof(char));
     if (!line) 
         return NULL;  // Memory allocation failed
     i = 0;
-    while (i < size_line) {
+    while (i < size_line) 
+	{
         line[i] = storage[i];
         i++;
     }
@@ -186,10 +186,9 @@ int main(void)
     char    *result;
     file_descriptor = open("archivo.txt", O_RDONLY);
     result = get_next_line(file_descriptor);
-	
     while (result)
     {
-        printf("%s", result);
+        printf(".....%s", result);
         free(result);
         result = get_next_line(file_descriptor);
     }
