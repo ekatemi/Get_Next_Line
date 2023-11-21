@@ -201,7 +201,7 @@ char *get_next_line(int fd)
     {
         // Read more data into the buffer if needed
         bucket_buffer = read_from_file(bucket_buffer, fd);
-        printf("What returns read_from_file ----->%s\n", bucket_buffer);
+        //printf("What returns read_from_file ----->%s\n", bucket_buffer);
     }
 
     line = extract_line(bucket_buffer);

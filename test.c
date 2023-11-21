@@ -75,12 +75,13 @@ char	*ft_strchr(char *s, int c)
 	return (NULL);
 }
 
-char *append_buffer(char *basin_buffer, char *read_buffer)
+char *append_buffer(char *persistent_buffer, char *read_buffer)
 {
  char *temp;
 
- temp = ft_strjoin(basin_buffer, read_buffer);
- free(basin_buffer);
+ temp = ft_strjoin(persistent_buffer, read_buffer);
+ free(persistent_buffer);
+ 
  return (temp);
 }
 
@@ -139,44 +140,52 @@ char	*update_storage(char *storage)
 	return (storage);
 }
 
-char *read_from_file(char *basin_buffer, int fd)
+char *read_from_file(char *persistent_buffer, int fd)
 {
- char *cup_buffer;
+ char *read_buffer;
+ //to check if read function works correctly
  int  bytes_read;
-
- cup_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
- if (!cup_buffer)
+//memory allocation for readtime buffer
+ read_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
+ if (!read_buffer) //error alloc
   return (NULL);
- bytes_read = 1;
+ bytes_read = 1; //to enter the loop
  while (bytes_read > 0)
  {
-  bytes_read = read(fd, cup_buffer, BUFFER_SIZE);
-  if (bytes_read == -1)
-   return (free(cup_buffer), NULL);
-  cup_buffer[bytes_read] = '\0';
-  basin_buffer = append_buffer(basin_buffer, cup_buffer);
-  if (ft_strchr(basin_buffer, '\n'))
+  bytes_read = read(fd, read_buffer, BUFFER_SIZE);
+  if (bytes_read == -1) //error
+   return (free(read_buffer), NULL);
+  read_buffer[bytes_read] = '\0'; //null terminate for using string func
+  //append read buffer to static buffer
+  persistent_buffer = append_buffer(persistent_buffer, read_buffer); 
+  //if there is a newline in the static buffer, break the loop
+  if (ft_strchr(persistent_buffer, '\n'))
    break ;
  }
- free (cup_buffer);
- return (basin_buffer);
+ free (read_buffer);
+ return (persistent_buffer);
 }
 
 char *get_next_line(int fd)
 {
- static char *basin_buffer;
+ static char *persistent_buffer;
  char  *line;
-
- if (fd < 0 || read(fd, NULL, 0) < 0 || BUFFER_SIZE <= 0) 
+//check if fd and BUFFER_Size is valid
+ if (fd < 0 || BUFFER_SIZE <= 0) 
   return (NULL);
- if (!basin_buffer)
-  basin_buffer = malloc(sizeof (char) * 1); 
- if (!ft_strchr(basin_buffer, '\n'))
-  basin_buffer = read_from_file(basin_buffer, fd);
- if (!basin_buffer)
-  return (free(basin_buffer), NULL);
- line = extract_line(basin_buffer);
- basin_buffer = update_storage(basin_buffer);
+//first call, we need to inicialize static buffer with 1 byte.
+ if (!persistent_buffer)
+  persistent_buffer = malloc(sizeof(char) * 1); 
+ //if there is no newline in static buffer, read new portion from fd
+ if (!ft_strchr(persistent_buffer, '\n'))
+  persistent_buffer = read_from_file(persistent_buffer, fd);
+ //if allocation fails free persistent buf and return NULL
+ if (!persistent_buffer)
+  return (free(persistent_buffer), NULL);
+ //line is a substring from start to \n including
+ line = extract_line(persistent_buffer);
+ //update static buffer with the rest of string
+ persistent_buffer = update_storage(persistent_buffer);
  return (line);
 }
 
