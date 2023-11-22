@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <stddef.h>  // Include for size_t
 
-#define BUFFER_SIZE 1
+#define BUFFER_SIZE 999999999
 
 size_t ft_strlen(char *str)
 {
@@ -33,7 +33,7 @@ char *strjoin(char *str1, char *str2)
     char *joined;
     char *temp;
 
-    joined = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2)) + 1);
+    joined = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 1));
     if (!joined)
         return (NULL);
     temp = joined;
@@ -58,86 +58,95 @@ char *append(char *buffer, char *str)
     return (new_buf);
 }
 
+char *ft_strcpy(char *s1, char *s2)
+{
+    char *temp;
+
+    temp = s1;
+    while (*s2)
+    {
+        *s1++ = *s2++;
+    }
+    *s1 = '\0';
+    return (temp);
+}
+
 
 //PARAMETERS file descriptor
 //RETURNS string with \n or \0 at the end
-char *extract_line(char *storage) {
-    int i;
-	int size_line;
-	
-	if (storage[0] == '\0') {
+char *extract_line(char *buffer) 
+{    
+	int line_size;
+	char *temp;
+
+	if (buffer[0] == '\0') 
         return NULL;  // Empty string, no line to extract
-    }
-    size_line = 0;
-    while (storage[size_line] != 0 && storage[size_line] != '\n')
-        size_line++;
-    if (storage[size_line] == '\n') 
-        size_line++;  // Include the newline character in the extracted line
-    char *line = malloc((size_line + 1) * sizeof(char));
+    line_size = 0;
+    while (buffer[line_size] && buffer[line_size] != '\n')
+        line_size++;
+    if (buffer[line_size] == '\n') 
+        line_size++;  // Include the newline character in the extracted line
+    char *line = malloc(sizeof(char) * (line_size + 1));
     if (!line) 
         return NULL;  // Memory allocation failed
-    i = 0;
-    while (i < size_line) 
-	{
-        line[i] = storage[i];
-        i++;
-    }
-    line[i] = '\0';  // Null-terminate the string
+    temp = line;
+    while (0 < line_size--) 
+        *temp++ = *buffer++;
+    *temp = '\0';  // Null-terminate the string
     return (line);
 }
 
-char	*update_storage(char *storage)
+char	*update_storage(char *buffer)
 {
 	char	*ptr_newline;
-	char	*rest_of_line;
-	int		size_rest_of_line;
-	int		i;
+	char	*rest_line;
+	int		line_size;
+	char    *temp;
 
-	ptr_newline = ft_strchr(storage, '\n');
+	ptr_newline = ft_strchr(buffer, '\n');
 	if (!ptr_newline)
 	{
-		free(storage);
+		free(buffer);
 		return (NULL);
 	}
-	size_rest_of_line = ft_strlen(ptr_newline + 1);
-	rest_of_line = malloc(size_rest_of_line * sizeof(char) + 1);
-	if (!rest_of_line)
+	line_size = ft_strlen(ptr_newline) - 1;
+	rest_line = malloc(sizeof(char) * (line_size + 1));
+	if (!rest_line)
 	{
-		free(storage);
+		free(buffer);
 		return (NULL);
 	}
-	i = -1;
-	while (++i < size_rest_of_line)
-		rest_of_line[i] = ptr_newline[i + 1];
-	rest_of_line[i] = '\0';
-	free (storage);
-	storage = rest_of_line;
-	return (storage);
+    temp = rest_line;
+	while (0 < line_size--)
+		*temp++ = *++ptr_newline;
+	*temp = '\0';
+	free (buffer);
+	buffer = rest_line;
+	return (buffer);
 }
 
-char *read_from_file(char *persistent_buffer, int fd)
+char *read_from_file(int fd, char *persistent_buffer)
 {
- char *read_buffer;
+ char *r_buffer;
  //to check if read function works correctly
- int  bytes_read;
+ int  bytes_nbr;
 //memory allocation for readtime buffer
- read_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
- if (!read_buffer) //error alloc
+ r_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
+ if (!r_buffer) //error alloc
   return (NULL);
- bytes_read = 1; //to enter the loop
- while (bytes_read > 0)
+ while (1) //endless loop
  {
-  bytes_read = read(fd, read_buffer, BUFFER_SIZE);
-  if (bytes_read == -1) //error
-   return (free(read_buffer), NULL);
-  read_buffer[bytes_read] = '\0'; //null terminate for using string func
+  bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
+  if (bytes_nbr == -1) //error
+   return (free(r_buffer), NULL);
+   r_buffer[bytes_nbr] = '\0';
   //append read buffer to static buffer
-  persistent_buffer = append(persistent_buffer, read_buffer); 
+  persistent_buffer = append(persistent_buffer, r_buffer); 
   //if there is a newline in the static buffer, break the loop
-  if (ft_strchr(persistent_buffer, '\n'))
+  if (ft_strchr(persistent_buffer, '\n') || bytes_nbr == 0)
    break ;
  }
- free (read_buffer);
+ free (r_buffer);
  return (persistent_buffer);
 }
 
@@ -153,7 +162,7 @@ char *get_next_line(int fd)
   persistent_buffer = malloc(sizeof(char) * 1); 
  //if there is no newline in static buffer, read new portion from fd
  if (!ft_strchr(persistent_buffer, '\n'))
-  persistent_buffer = read_from_file(persistent_buffer, fd);
+  persistent_buffer = read_from_file(fd, persistent_buffer);
  //if allocation fails free persistent buf and return NULL
  if (!persistent_buffer)
   return (free(persistent_buffer), NULL);
