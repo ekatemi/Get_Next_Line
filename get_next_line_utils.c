@@ -6,7 +6,7 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/12 18:01:57 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/14 22:24:49 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/11/29 20:12:15 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,16 @@ size_t ft_strlen(char *str)
     return (len);
 }
 
-char *ft_strchr(char *str, int c)
+char	*ft_strchr(char *s, int c)
 {
-    while(*str)
-    {
-        if (*str == (char)c)
-            return (str);
-        str++;
-    }
-    if ((char)c == '\0')
-        return (str);
-    return (NULL);
+	int	i;
+
+	i = 0;
+	while (s[i] && s[i] != c)
+		i++;
+	if (s[i] == '\0')
+		return (NULL);
+	return (&s[i]);
 }
 
 char *strjoin(char *str1, char *str2)
@@ -44,7 +43,7 @@ char *strjoin(char *str1, char *str2)
 
     joined = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 1));
     if (!joined)
-        return (NULL);
+        return (get_free(&joined, NULL));
     temp = joined;
     while (*str1)
         *temp++ = *str1++;
@@ -61,7 +60,7 @@ char *append(char *buffer, char *str)
     new_buf = strjoin(buffer, str);
     if(!new_buf)
         return (NULL);
-    free(buffer);
+    get_free(&buffer, NULL);
     return (new_buf);
 }
 
@@ -78,7 +77,7 @@ char *extract_line(char *buffer)
     if (buffer[line_size] == '\n') 
         line_size++;  // Include the newline character in the extracted line
     char *line = malloc(sizeof(char) * (line_size + 1));
-    if (!line) 
+    if (!line) 	
         return NULL;  // Memory allocation failed
     temp = line;
     while (0 < line_size--) 
@@ -97,15 +96,13 @@ char	*update_storage(char *buffer)
 	ptr_newline = ft_strchr(buffer, '\n');
 	if (!ptr_newline)
 	{
-		free(buffer);
-		return (NULL);
+		return (get_free(&buffer, NULL));
 	}
 	line_size = ft_strlen(ptr_newline) - 1;
-	rest_line = malloc(sizeof(char) * (line_size + 1));
+	rest_line = calloc(sizeof(char), (line_size + 1));
 	if (!rest_line)
 	{
-		free(buffer);
-		return (NULL);
+		get_free(&buffer, NULL);
 	}
     temp = rest_line;
 	while (0 < line_size--)
@@ -116,27 +113,29 @@ char	*update_storage(char *buffer)
 	return (buffer);
 }
 
-char *read_from_file(int fd, char *persistent_buffer)
+char *read_from_file(int fd, char *buffer)
 {
- char *r_buffer;
+    char *r_buffer;
  //to check if read function works correctly
- int  bytes_nbr;
+    int  bytes_nbr;
 //memory allocation for readtime buffer
- r_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
- if (!r_buffer) //error alloc
-  return (NULL);
- while (1) //endless loop
- {
-  bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
-  if (bytes_nbr == -1) //error
-   return (free(r_buffer), NULL);
-   r_buffer[bytes_nbr] = '\0';
-  //append read buffer to static buffer
-  persistent_buffer = append(persistent_buffer, r_buffer); 
-  //if there is a newline in the static buffer, break the loop
-  if (ft_strchr(persistent_buffer, '\n') || bytes_nbr == 0)
-   break ;
+    r_buffer = calloc(BUFFER_SIZE, sizeof(char) + 1);
+    if (!r_buffer) //error alloc
+        return (NULL);
+    while (1) //endless loop
+    {
+        bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
+        if (bytes_nbr == -1)
+        {
+            return (get_free(&r_buffer, NULL));
+            //r_buffer = NULL;
+            //return (NULL);
+        }
+        r_buffer[bytes_nbr] = '\0';
+        buffer = append(buffer, r_buffer);
+        if (ft_strchr(buffer, '\n') || bytes_nbr == 0)
+            break ;
  }
  free (r_buffer);
- return (persistent_buffer);
+ return (buffer);
 }
