@@ -1,5 +1,12 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "__node_handle": "c"
     }
+=======
+        "stdlib.h": "c",
+        "string.h": "c"
+    },
+    "cmake.configureOnOpen": true
+>>>>>>> 1c55686ef6937827d4901e9ff4445c878909018c
 }

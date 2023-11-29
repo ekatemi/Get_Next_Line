@@ -14,6 +14,7 @@
 
 #define BUF_SIZE 7
 
+<<<<<<< HEAD
 int	ft_strlen(char *str)
 {
 	int	len;
@@ -74,6 +75,9 @@ void    print_newline_helper(char *buffer)
         buffer++;
     }
 }
+=======
+
+>>>>>>> 1c55686ef6937827d4901e9ff4445c878909018c
 
 char *read_line(int fd)
 {
@@ -90,6 +94,7 @@ char *read_line(int fd)
 		free(spoon_buffer);
         return NULL;
 	}
+<<<<<<< HEAD
     spoon_buffer[bytes_read] = '\0';
     return spoon_buffer;
 }
@@ -105,10 +110,15 @@ char *get_next_line(int fd)
 
     big_buffer = ft_strjoin(big_buffer, line);
     return(big_buffer);
+=======
+	buffer[bytes_read] = '\0';
+    return buffer;
+>>>>>>> 1c55686ef6937827d4901e9ff4445c878909018c
 }
 
-int main (void)
+int main(void)
 {
+<<<<<<< HEAD
 	int fd;
 	char *next_line;
 	int count;
@@ -129,4 +139,20 @@ int main (void)
 	}
 	close(fd);
 	return (0);
+=======
+    int     file_descriptor;
+    char    *result;
+    file_descriptor = open("archivo.txt", O_RDONLY);
+    result = read_line(file_descriptor);
+	printf("%s", result);
+    /*
+    while (result)
+    {
+        printf("%s", result);
+        free(result);
+        result = get_next_line(file_descriptor);
+    }*/
+    free(result);
+    return (0);
+>>>>>>> 1c55686ef6937827d4901e9ff4445c878909018c
 }

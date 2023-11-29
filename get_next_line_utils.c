@@ -15,113 +15,128 @@
 #include <stdio.h>
 #include "get_next_line.h"
 
-void	*ft_calloc(size_t count, size_t size)
+size_t ft_strlen(char *str)
 {
-	char	*ptr;
+    size_t len;
+    len = 0;
+    while(*str++)
+        len++;
+    return (len);
+}
 
-	ptr = (char *)malloc(count * size);
-	if (count == 0 || size == 0)
+char *ft_strchr(char *str, int c)
+{
+    while(*str)
+    {
+        if (*str == (char)c)
+            return (str);
+        str++;
+    }
+    if ((char)c == '\0')
+        return (str);
+    return (NULL);
+}
+
+char *strjoin(char *str1, char *str2)
+{
+    char *joined;
+    char *temp;
+
+    joined = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 1));
+    if (!joined)
+        return (NULL);
+    temp = joined;
+    while (*str1)
+        *temp++ = *str1++;
+    while (*str2)
+        *temp++ = *str2++;
+    *temp = '\0';
+    return (joined);
+}
+
+char *append(char *buffer, char *str)
+{
+    char *new_buf;
+    
+    new_buf = strjoin(buffer, str);
+    if(!new_buf)
+        return (NULL);
+    free(buffer);
+    return (new_buf);
+}
+
+char *extract_line(char *buffer) 
+{    
+	int line_size;
+	char *temp;
+
+	if (buffer[0] == '\0') 
+        return NULL;
+    line_size = 0;
+    while (buffer[line_size] && buffer[line_size] != '\n')
+        line_size++;
+    if (buffer[line_size] == '\n') 
+        line_size++;  // Include the newline character in the extracted line
+    char *line = malloc(sizeof(char) * (line_size + 1));
+    if (!line) 
+        return NULL;  // Memory allocation failed
+    temp = line;
+    while (0 < line_size--) 
+        *temp++ = *buffer++;
+    *temp = '\0';  // Null-terminate the string
+    return (line);
+}
+
+char	*update_storage(char *buffer)
+{
+	char	*ptr_newline;
+	char	*rest_line;
+	int		line_size;
+	char    *temp;
+
+	ptr_newline = ft_strchr(buffer, '\n');
+	if (!ptr_newline)
 	{
-		count = 1;
-		size = 1;
-	}
-	if (ptr)
-		ft_bzero (ptr, count * size);
-	return (ptr);
-}
-
-void	*ft_memset(void *b, int c, size_t len)
-
-{
-	unsigned char	*ptr;
-
-	ptr = (unsigned char *)b;
-	while (len--)
-		*ptr++ = c;
-	return (b);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	ft_memset(s, '\0', n);
-}
-/*
-int	ft_strlen(char *str)
-{
-	int	len;
-
-	len = 0;
-	while (*str)
-	{
-		len++;
-		str++;
-	}
-	return (len);
-}
-
-char	*ft_strdup(char *s1)
-{
-	size_t			size;
-	unsigned int	i;
-	char			*copy;
-
-	i = 0;
-	size = ft_strlen(s1);
-	copy = (char *)malloc(sizeof(char) * (size + 1));
-	if (copy == NULL)
+		free(buffer);
 		return (NULL);
-	while (s1[i] != '\0')
-	{
-		copy[i] = s1[i];
-		i++;
 	}
-	copy[i] = '\0';
-	return (copy);
-}
-
-
-
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	s1_len;
-	size_t	s2_len;
-	char	*joined;
-	size_t	i;
-
-	s1_len = ft_strlen(s1);
-	s2_len = ft_strlen(s2);
-	joined = (char *)malloc(s1_len + s2_len + 1);
-	i = 0;
-	if (joined == NULL)
+	line_size = ft_strlen(ptr_newline) - 1;
+	rest_line = malloc(sizeof(char) * (line_size + 1));
+	if (!rest_line)
+	{
+		free(buffer);
 		return (NULL);
-	while (*s1)
-	{
-		joined[i] = *s1++;
-		i++;
 	}
-	while (*s2)
-	{
-		joined[i] = *s2++;
-		i++;
-	}
-	joined[i] = '\0';
-	return (joined);
+    temp = rest_line;
+	while (0 < line_size--)
+		*temp++ = *++ptr_newline;
+	*temp = '\0';
+	free (buffer);
+	buffer = rest_line;
+	return (buffer);
 }
 
-char	*ft_strchr(const char *s, int c)
+char *read_from_file(int fd, char *persistent_buffer)
 {
-	while (*s)
-	{
-		if (*s == (char)c)
-		{
-			return ((char *)s);
-		}
-		s++;
-	}
-	if ((char)c == '\0')
-	{
-		return ((char *)s);
-	}
-	return ((void *)0);
-}*/
+ char *r_buffer;
+ //to check if read function works correctly
+ int  bytes_nbr;
+//memory allocation for readtime buffer
+ r_buffer = malloc(BUFFER_SIZE * sizeof(char) + 1);
+ if (!r_buffer) //error alloc
+  return (NULL);
+ while (1) //endless loop
+ {
+  bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
+  if (bytes_nbr == -1) //error
+   return (free(r_buffer), NULL);
+   r_buffer[bytes_nbr] = '\0';
+  //append read buffer to static buffer
+  persistent_buffer = append(persistent_buffer, r_buffer); 
+  //if there is a newline in the static buffer, break the loop
+  if (ft_strchr(persistent_buffer, '\n') || bytes_nbr == 0)
+   break ;
+ }
+ free (r_buffer);
+ return (persistent_buffer);
+}
