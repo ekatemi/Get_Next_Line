@@ -15,13 +15,14 @@
 #include <stdio.h>
 #include "get_next_line.h"
 
-size_t ft_strlen(char *str)
+size_t	ft_strlen(char *str)
 {
-    size_t len;
-    len = 0;
-    while(*str++)
-        len++;
-    return (len);
+	size_t	len;
+
+	len = 0;
+	while (*str++)
+		len++;
+	return (len);
 }
 
 char	*ft_strchr(char *s, int c)
@@ -36,62 +37,43 @@ char	*ft_strchr(char *s, int c)
 	return (&s[i]);
 }
 
-char *strjoin(char *str1, char *str2)
+char *ft_strjoin(char *buffer, char *str)
 {
-    char *joined;
-    char *temp;
+	char	*new_buf;
+	int		i;
+	int		j;
 
-    joined = calloc(sizeof(char),(ft_strlen(str1) + ft_strlen(str2) + 1));
-    if (!joined)
-        return (get_free(&joined));
-    temp = joined;
-    while (*str1)
-        *temp++ = *str1++;
-    while (*str2)
-        *temp++ = *str2++;
-    //*temp = '\0';
-    return (joined);
+	i = 0;
+	j = 0;
+	new_buf = malloc(sizeof(char) * (ft_strlen(buffer) + ft_strlen(str) + 1));
+	if (!new_buf)
+		return (get_free(&buffer));
+	while (buffer[i])
+	{
+    	new_buf[i] = buffer[i];
+    	i++;
+	}
+	while(str[j])
+    	new_buf[i++] = str[j++];
+	new_buf[i] = '\0';
+	free(buffer);
+	return (new_buf);
 }
 
-char *append(char *buffer, char *str)
-{
-    char *new_buf;
-    
-    new_buf = strjoin(buffer, str);
-    if(!new_buf)
-        return (NULL);
-    get_free(&buffer);
-    return (new_buf);
-}
 
 void *ft_calloc(size_t count, size_t size)
 {
-    void *ptr;
+    char *ptr;
+    size_t i;
 
-    ptr = malloc(count * size);
+    i = 0;
+    ptr = malloc(sizeof(char) * (count * size));
     if (!ptr)
         return NULL;
-    size_t i = 0;
     while (i < count * size)
     {
-        *((char *)ptr + i) = 0;
+        ptr[i] = '\0';
         i++;
     }
-
     return ptr;
 }
-/*
-void
-	ft_bzero(void *s, size_t n)
-{
-	size_t	i;
-
-	if (!s)
-		return ;
-	i = 0;
-	while (i < n)
-	{
-		*(char*)(s + i) = 0;
-		i++;
-	}
-}*/

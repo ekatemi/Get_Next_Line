@@ -25,8 +25,7 @@
 char *get_free(char **str1);
 size_t ft_strlen(char *str);
 char *ft_strchr(char *str, int c);
-char *strjoin(char *str1, char *str2);
-char *append(char *buffer, char *str);
+char *ft_strjoin(char *buffer, char *str);
 char *extract_line(char *buffer);
 char	*update_storage(char *buffer);
 char *read_from_file(int fd, char *persistent_buffer);
