@@ -22,7 +22,7 @@
 #  define BUFFER_SIZE 42
 # endif
 
-char *get_free(char **str1, char **str2);
+char *get_free(char **str1);
 size_t ft_strlen(char *str);
 char *ft_strchr(char *str, int c);
 char *strjoin(char *str1, char *str2);
@@ -31,6 +31,6 @@ char *extract_line(char *buffer);
 char	*update_storage(char *buffer);
 char *read_from_file(int fd, char *persistent_buffer);
 char *get_next_line(int fd);
-
+void	*ft_calloc(size_t count, size_t size);
 
 #endif

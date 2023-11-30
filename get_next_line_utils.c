@@ -41,15 +41,15 @@ char *strjoin(char *str1, char *str2)
     char *joined;
     char *temp;
 
-    joined = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 1));
+    joined = calloc(sizeof(char),(ft_strlen(str1) + ft_strlen(str2) + 1));
     if (!joined)
-        return (get_free(&joined, NULL));
+        return (get_free(&joined));
     temp = joined;
     while (*str1)
         *temp++ = *str1++;
     while (*str2)
         *temp++ = *str2++;
-    *temp = '\0';
+    //*temp = '\0';
     return (joined);
 }
 
@@ -60,82 +60,38 @@ char *append(char *buffer, char *str)
     new_buf = strjoin(buffer, str);
     if(!new_buf)
         return (NULL);
-    get_free(&buffer, NULL);
+    get_free(&buffer);
     return (new_buf);
 }
 
-char *extract_line(char *buffer) 
-{    
-	int line_size;
-	char *temp;
+void *ft_calloc(size_t count, size_t size)
+{
+    void *ptr;
 
-	if (buffer[0] == '\0') 
+    ptr = malloc(count * size);
+    if (!ptr)
         return NULL;
-    line_size = 0;
-    while (buffer[line_size] && buffer[line_size] != '\n')
-        line_size++;
-    if (buffer[line_size] == '\n') 
-        line_size++;  // Include the newline character in the extracted line
-    char *line = malloc(sizeof(char) * (line_size + 1));
-    if (!line) 	
-        return NULL;  // Memory allocation failed
-    temp = line;
-    while (0 < line_size--) 
-        *temp++ = *buffer++;
-    *temp = '\0';  // Null-terminate the string
-    return (line);
-}
-
-char	*update_storage(char *buffer)
-{
-	char	*ptr_newline;
-	char	*rest_line;
-	int		line_size;
-	char    *temp;
-
-	ptr_newline = ft_strchr(buffer, '\n');
-	if (!ptr_newline)
-	{
-		return (get_free(&buffer, NULL));
-	}
-	line_size = ft_strlen(ptr_newline) - 1;
-	rest_line = calloc(sizeof(char), (line_size + 1));
-	if (!rest_line)
-	{
-		get_free(&buffer, NULL);
-	}
-    temp = rest_line;
-	while (0 < line_size--)
-		*temp++ = *++ptr_newline;
-	*temp = '\0';
-	free (buffer);
-	buffer = rest_line;
-	return (buffer);
-}
-
-char *read_from_file(int fd, char *buffer)
-{
-    char *r_buffer;
- //to check if read function works correctly
-    int  bytes_nbr;
-//memory allocation for readtime buffer
-    r_buffer = calloc(BUFFER_SIZE, sizeof(char) + 1);
-    if (!r_buffer) //error alloc
-        return (NULL);
-    while (1) //endless loop
+    size_t i = 0;
+    while (i < count * size)
     {
-        bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
-        if (bytes_nbr == -1)
-        {
-            return (get_free(&r_buffer, NULL));
-            //r_buffer = NULL;
-            //return (NULL);
-        }
-        r_buffer[bytes_nbr] = '\0';
-        buffer = append(buffer, r_buffer);
-        if (ft_strchr(buffer, '\n') || bytes_nbr == 0)
-            break ;
- }
- free (r_buffer);
- return (buffer);
+        *((char *)ptr + i) = 0;
+        i++;
+    }
+
+    return ptr;
 }
+/*
+void
+	ft_bzero(void *s, size_t n)
+{
+	size_t	i;
+
+	if (!s)
+		return ;
+	i = 0;
+	while (i < n)
+	{
+		*(char*)(s + i) = 0;
+		i++;
+	}
+}*/
