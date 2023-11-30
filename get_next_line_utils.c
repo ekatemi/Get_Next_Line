@@ -6,7 +6,7 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/12 18:01:57 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/29 20:12:15 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/11/30 23:19:08 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*ft_strchr(char *s, int c)
 	return (&s[i]);
 }
 
-char *ft_strjoin(char *buffer, char *str)
+char	*ft_strjoin(char *buffer, char *str)
 {
 	char	*new_buf;
 	int		i;
@@ -50,30 +50,29 @@ char *ft_strjoin(char *buffer, char *str)
 		return (get_free(&buffer));
 	while (buffer[i])
 	{
-    	new_buf[i] = buffer[i];
-    	i++;
+		new_buf[i] = buffer[i];
+		i++;
 	}
-	while(str[j])
-    	new_buf[i++] = str[j++];
+	while (str[j])
+		new_buf[i++] = str[j++];
 	new_buf[i] = '\0';
 	free(buffer);
 	return (new_buf);
 }
 
-
-void *ft_calloc(size_t count, size_t size)
+void	*ft_calloc(size_t count, size_t size)
 {
-    char *ptr;
-    size_t i;
+	char	*ptr;
+	size_t	i;
 
-    i = 0;
-    ptr = malloc(sizeof(char) * (count * size));
-    if (!ptr)
-        return NULL;
-    while (i < count * size)
-    {
-        ptr[i] = '\0';
-        i++;
-    }
-    return ptr;
+	i = 0;
+	ptr = malloc(sizeof(char) * (count * size));
+	if (!ptr)
+		return (NULL);
+	while (i < count * size)
+	{
+		ptr[i] = '\0';
+		i++;
+	}
+	return (ptr);
 }

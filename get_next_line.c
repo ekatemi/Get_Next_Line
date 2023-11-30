@@ -6,13 +6,13 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 21:29:13 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/29 20:54:25 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/11/30 23:13:13 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *extract_line(char *buffer) 
+char	*extract_line(char *buffer)
 {
 	int		line_size;
 	char	*temp;
@@ -29,10 +29,10 @@ char *extract_line(char *buffer)
 	if (!line)
 		return (NULL);
 	temp = line;
-    while (0 < line_size--) 
-        *temp++ = *buffer++;
-	*temp = '\0';  // Null-terminate the string
-    return (line);
+	while (0 < line_size--)
+		*temp++ = *buffer++;
+	*temp = '\0';
+	return (line);
 }
 
 char	*update_storage(char *buffer)
@@ -40,7 +40,7 @@ char	*update_storage(char *buffer)
 	char	*ptr_newline;
 	char	*rest_line;
 	int		line_size;
-	char    *temp;
+	char	*temp;
 
 	ptr_newline = ft_strchr(buffer, '\n');
 	if (!ptr_newline)
@@ -50,8 +50,8 @@ char	*update_storage(char *buffer)
 	line_size = ft_strlen(ptr_newline) - 1;
 	rest_line = ft_calloc((line_size + 1), sizeof(char));
 	if (!rest_line)
-		return	get_free(&buffer);
-    temp = rest_line;
+		return (get_free(&buffer));
+	temp = rest_line;
 	while (0 < line_size--)
 		*temp++ = *++ptr_newline;
 	free (buffer);
@@ -59,37 +59,37 @@ char	*update_storage(char *buffer)
 	return (buffer);
 }
 
-char *read_from_file(int fd, char *buffer)
+char	*read_from_file(int fd, char *buffer)
 {
-    char *r_buffer;
-    int  bytes_nbr;
+	char	*r_buffer;
+	int		bytes_nbr;
 
-    r_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-    if (!r_buffer)
+	r_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!r_buffer)
 	{
 		free(buffer);
-        return (NULL);
+		return (NULL);
 	}
 	bytes_nbr = 1;
-    while (bytes_nbr > 0 && !ft_strchr(buffer, '\n'))
-    {
-        bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
-        if (bytes_nbr == -1)
+	while (bytes_nbr > 0 && !ft_strchr(buffer, '\n'))
+	{
+		bytes_nbr = read(fd, r_buffer, BUFFER_SIZE);
+		if (bytes_nbr == -1)
 		{
 			free(buffer);
 			free(r_buffer);
-            return (NULL);
+			return (NULL);
 		}
-        r_buffer[bytes_nbr] = '\0';
-        buffer = ft_strjoin(buffer, r_buffer);
+		r_buffer[bytes_nbr] = '\0';
+		buffer = ft_strjoin(buffer, r_buffer);
 		if (!buffer)
-			break;
+			break ;
 	}
- free(r_buffer);
- return (buffer);
+	free(r_buffer);
+	return (buffer);
 }
 
-char *get_free(char **str1)
+char	*get_free(char **str1)
 {
 	if (str1 && *str1)
 	{
