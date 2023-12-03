@@ -6,7 +6,7 @@
 /*   By: emikhayl <emikhayl@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 21:29:13 by emikhayl          #+#    #+#             */
-/*   Updated: 2023/11/30 23:13:13 by emikhayl         ###   ########.fr       */
+/*   Updated: 2023/12/03 15:05:41 by emikhayl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,7 @@ char	*read_from_file(int fd, char *buffer)
 
 	r_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!r_buffer)
-	{
-		free(buffer);
-		return (NULL);
-	}
+		return (get_free(&buffer));
 	bytes_nbr = 1;
 	while (bytes_nbr > 0 && !ft_strchr(buffer, '\n'))
 	{
